@@ -1,4 +1,4 @@
-# Groom your app’s Rust environment with rsenv.
+# Rust version management with **rsenv**.
 
 Use rsenv to pick a Rust version for your application and guarantee
 that your development environment matches production.
