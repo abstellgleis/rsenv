@@ -3,28 +3,28 @@
 load test_helper
 
 setup() {
-  mkdir -p "$RBENV_TEST_DIR"
-  cd "$RBENV_TEST_DIR"
+  mkdir -p "$RSENV_TEST_DIR"
+  cd "$RSENV_TEST_DIR"
 }
 
 @test "invocation without 2 arguments prints usage" {
-  run rbenv-version-file-write
-  assert_failure "Usage: rbenv version-file-write <file> <version>"
-  run rbenv-version-file-write "one" ""
+  run rsenv-version-file-write
+  assert_failure "Usage: rsenv version-file-write <file> <version>"
+  run rsenv-version-file-write "one" ""
   assert_failure
 }
 
 @test "setting nonexistent version fails" {
-  assert [ ! -e ".ruby-version" ]
-  run rbenv-version-file-write ".ruby-version" "1.8.7"
-  assert_failure "rbenv: version \`1.8.7' not installed"
-  assert [ ! -e ".ruby-version" ]
+  assert [ ! -e ".rust-version" ]
+  run rsenv-version-file-write ".rust-version" "0.8"
+  assert_failure "rsenv: version \`0.8' not installed"
+  assert [ ! -e ".rust-version" ]
 }
 
 @test "writes value to arbitrary file" {
-  mkdir -p "${RBENV_ROOT}/versions/1.8.7"
+  mkdir -p "${RSENV_ROOT}/versions/0.8"
   assert [ ! -e "my-version" ]
-  run rbenv-version-file-write "${PWD}/my-version" "1.8.7"
+  run rsenv-version-file-write "${PWD}/my-version" "0.8"
   assert_success ""
-  assert [ "$(cat my-version)" = "1.8.7" ]
+  assert [ "$(cat my-version)" = "0.8" ]
 }

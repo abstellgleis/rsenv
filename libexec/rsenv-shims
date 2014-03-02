@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Summary: List existing rbenv shims
-# Usage: rbenv shims [--short]
+# Summary: List existing rsenv shims
+# Usage: rsenv shims [--short]
 
 set -e
-[ -n "$RBENV_DEBUG" ] && set -x
+[ -n "$RSENV_DEBUG" ] && set -x
 
-# Provide rbenv completions
+# Provide rsenv completions
 if [ "$1" = "--complete" ]; then
   echo --short
   exit
@@ -13,7 +13,7 @@ fi
 
 shopt -s nullglob
 
-for command in "${RBENV_ROOT}/shims/"*; do
+for command in "${RSENV_ROOT}/shims/"*; do
   if [ "$1" = "--short" ]; then
     echo "${command##*/}"
   else

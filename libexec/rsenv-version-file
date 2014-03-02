@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Summary: Detect the file that sets the current rsenv version
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+find_local_version_file() {
+  local root="$1"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/.rust-version" ]; then
+      echo "${root}/.rust-version"
+      exit
+    elif [ -e "${root}/.rsenv-version" ]; then
+      echo "${root}/.rsenv-version"
+      exit
+    fi
+    root="${root%/*}"
+  done
+}
+
+find_local_version_file "$RSENV_DIR"
+[ "$RSENV_DIR" = "$PWD" ] || find_local_version_file "$PWD"
+
+global_version_file="${RSENV_ROOT}/version"
+
+if [ -e "$global_version_file" ]; then
+  echo "$global_version_file"
+elif [ -e "${RSENV_ROOT}/global" ]; then
+  echo "${RSENV_ROOT}/global"
+elif [ -e "${RSENV_ROOT}/default" ]; then
+  echo "${RSENV_ROOT}/default"
+else
+  echo "$global_version_file"
+fi

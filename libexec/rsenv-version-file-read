@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Usage: rbenv version-file-read <file>
+# Usage: rsenv version-file-read <file>
 set -e
-[ -n "$RBENV_DEBUG" ] && set -x
+[ -n "$RSENV_DEBUG" ] && set -x
 
 VERSION_FILE="$1"
 

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Usage: rsenv completions <command> [arg1 arg2...]
+
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+COMMAND="$1"
+if [ -z "$COMMAND" ]; then
+  rsenv-help --usage completions >&2
+  exit 1
+fi
+
+COMMAND_PATH="$(command -v "rsenv-$COMMAND" || command -v "rsenv-sh-$COMMAND")"
+if grep -iE "^([#%]|--|//) provide rsenv completions" "$COMMAND_PATH" >/dev/null; then
+  shift
+  exec "$COMMAND_PATH" --complete "$@"
+fi

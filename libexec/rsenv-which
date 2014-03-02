@@ -2,17 +2,17 @@
 #
 # Summary: Display the full path to an executable
 #
-# Usage: rbenv which <command>
+# Usage: rsenv which <command>
 #
-# Displays the full path to the executable that rbenv will invoke when
+# Displays the full path to the executable that rsenv will invoke when
 # you run the given command.
 
 set -e
-[ -n "$RBENV_DEBUG" ] && set -x
+[ -n "$RSENV_DEBUG" ] && set -x
 
-# Provide rbenv completions
+# Provide rsenv completions
 if [ "$1" = "--complete" ]; then
-  exec rbenv shims --short
+  exec rsenv shims --short
 fi
 
 expand_path() {
@@ -48,37 +48,37 @@ remove_from_path() {
   echo "${result%:}"
 }
 
-RBENV_VERSION="$(rbenv-version-name)"
-RBENV_COMMAND="$1"
+RSENV_VERSION="$(rsenv-version-name)"
+RSENV_COMMAND="$1"
 
-if [ -z "$RBENV_COMMAND" ]; then
-  rbenv-help --usage which >&2
+if [ -z "$RSENV_COMMAND" ]; then
+  rsenv-help --usage which >&2
   exit 1
 fi
 
-if [ "$RBENV_VERSION" = "system" ]; then
-  PATH="$(remove_from_path "${RBENV_ROOT}/shims")"
-  RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND" || true)"
+if [ "$RSENV_VERSION" = "system" ]; then
+  PATH="$(remove_from_path "${RSENV_ROOT}/shims")"
+  RSENV_COMMAND_PATH="$(command -v "$RSENV_COMMAND" || true)"
 else
-  RBENV_COMMAND_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
+  RSENV_COMMAND_PATH="${RSENV_ROOT}/versions/${RSENV_VERSION}/bin/${RSENV_COMMAND}"
 fi
 
 OLDIFS="$IFS"
-IFS=$'\n' scripts=(`rbenv-hooks which`)
+IFS=$'\n' scripts=(`rsenv-hooks which`)
 IFS="$OLDIFS"
 for script in "${scripts[@]}"; do
   source "$script"
 done
 
-if [ -x "$RBENV_COMMAND_PATH" ]; then
-  echo "$RBENV_COMMAND_PATH"
+if [ -x "$RSENV_COMMAND_PATH" ]; then
+  echo "$RSENV_COMMAND_PATH"
 else
-  echo "rbenv: $RBENV_COMMAND: command not found" >&2
+  echo "rsenv: $RSENV_COMMAND: command not found" >&2
 
-  versions="$(rbenv-whence "$RBENV_COMMAND" || true)"
+  versions="$(rsenv-whence "$RSENV_COMMAND" || true)"
   if [ -n "$versions" ]; then
     { echo
-      echo "The \`$1' command exists in these Ruby versions:"
+      echo "The \`$1' command exists in these Rust versions:"
       echo "$versions" | sed 's/^/  /g'
       echo
     } >&2

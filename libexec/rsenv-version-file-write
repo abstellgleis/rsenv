@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Usage: rsenv version-file-write <file> <version>
+
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+RSENV_VERSION_FILE="$1"
+RSENV_VERSION="$2"
+
+if [ -z "$RSENV_VERSION" ] || [ -z "$RSENV_VERSION_FILE" ]; then
+  rsenv-help --usage version-file-write >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed.
+rsenv-prefix "$RSENV_VERSION" >/dev/null
+
+# Write the version out to disk.
+echo "$RSENV_VERSION" > "$RSENV_VERSION_FILE"

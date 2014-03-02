@@ -3,29 +3,29 @@
 load test_helper
 
 @test "default" {
-  run rbenv global
+  run rsenv global
   assert_success
   assert_output "system"
 }
 
-@test "read RBENV_ROOT/version" {
-  mkdir -p "$RBENV_ROOT"
-  echo "1.2.3" > "$RBENV_ROOT/version"
-  run rbenv-global
+@test "read RSENV_ROOT/version" {
+  mkdir -p "$RSENV_ROOT"
+  echo "1.2.3" > "$RSENV_ROOT/version"
+  run rsenv-global
   assert_success
   assert_output "1.2.3"
 }
 
-@test "set RBENV_ROOT/version" {
-  mkdir -p "$RBENV_ROOT/versions/1.2.3"
-  run rbenv-global "1.2.3"
+@test "set RSENV_ROOT/version" {
+  mkdir -p "$RSENV_ROOT/versions/1.2.3"
+  run rsenv-global "1.2.3"
   assert_success
-  run rbenv global
+  run rsenv global
   assert_success "1.2.3"
 }
 
-@test "fail setting invalid RBENV_ROOT/version" {
-  mkdir -p "$RBENV_ROOT"
-  run rbenv-global "1.2.3"
-  assert_failure "rbenv: version \`1.2.3' not installed"
+@test "fail setting invalid RSENV_ROOT/version" {
+  mkdir -p "$RSENV_ROOT"
+  run rsenv-global "1.2.3"
+  assert_failure "rsenv: version \`1.2.3' not installed"
 }

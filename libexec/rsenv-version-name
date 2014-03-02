@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Summary: Show the current Rust version
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+if [ -z "$RSENV_VERSION" ]; then
+  RSENV_VERSION_FILE="$(rsenv-version-file)"
+  RSENV_VERSION="$(rsenv-version-file-read "$RSENV_VERSION_FILE" || true)"
+fi
+
+if [ -z "$RSENV_VERSION" ] || [ "$RSENV_VERSION" = "system" ]; then
+  echo "system"
+  exit
+fi
+
+version_exists() {
+  local version="$1"
+  [ -d "${RSENV_ROOT}/versions/${version}" ]
+}
+
+if version_exists "$RSENV_VERSION"; then
+  echo "$RSENV_VERSION"
+elif version_exists "${RSENV_VERSION#rust-}"; then
+  { echo "warning: ignoring extraneous \`rust-' prefix in version \`${RSENV_VERSION}'"
+    echo "         (set by $(rsenv-version-origin))"
+  } >&2
+  echo "${RSENV_VERSION#rust-}"
+else
+  echo "rsenv: version \`$RSENV_VERSION' is not installed" >&2
+  exit 1
+fi

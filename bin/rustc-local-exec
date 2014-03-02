@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# `rustc-local-exec` is a drop-in replacement for the standard Rust
+# shebang line:
+#
+#    #!/usr/bin/env rustc-local-exec
+#
+# Use it for scripts inside a project with an `.rsenv-version`
+# file. When you run the scripts, they'll use the project-specified
+# Rust version, regardless of what directory they're run from. Useful
+# for e.g. running project tasks in cron scripts without needing to
+# `cd` into the project first.
+
+set -e
+export RSENV_DIR="${1%/*}"
+
+[ -n "$RSENV_SILENCE_WARNINGS" ] || {
+  echo "rsenv: \`rust-local-exec' is deprecated and will be removed in the next release."
+  echo "       To upgrade: https://github.com/asaaki/rsenv/wiki/rust-local-exec"
+  echo
+} >&2
+
+exec rustc "$@"

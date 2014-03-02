@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the local application-specific Rust version
+#
+# Usage: rsenv local <version>
+#        rsenv local --unset
+#
+# Sets the local application-specific Rust version by writing the
+# version name to a file named `.rust-version'.
+#
+# When you run a Rust command, rsenv will look for a `.rust-version'
+# file in the current directory and each parent directory. If no such
+# file is found in the tree, rsenv will use the global Rust version
+# specified with `rsenv global'. A version specified with the
+# `RSENV_VERSION' environment variable takes precedence over local
+# and global versions.
+#
+# For backwards compatibility, rsenv will also read version
+# specifications from `.rsenv-version' files, but a `.rust-version'
+# file in the same directory takes precedence.
+#
+# <version> should be a string matching a Rust version known to rsenv.
+# The special version string `system' will use your default system Rust.
+# Run `rsenv versions' for a list of available Rust versions.
+
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+# Provide rsenv completions
+if [ "$1" = "--complete" ]; then
+  echo --unset
+  echo system
+  exec rsenv-versions --bare
+fi
+
+RSENV_VERSION="$1"
+
+if [ "$RSENV_VERSION" = "--unset" ]; then
+  rm -f .rust-version .rsenv-version
+elif [ -n "$RSENV_VERSION" ]; then
+  previous_file="$(RSENV_VERSION= rsenv-version-origin || true)"
+  rsenv-version-file-write .rust-version "$RSENV_VERSION"
+  if [ "$previous_file" -ef .rsenv-version ]; then
+    rm -f .rsenv-version
+    { echo "rsenv: removed existing \`.rsenv-version' file and migrated"
+      echo "       local version specification to \`.rust-version' file"
+    } >&2
+  fi
+else
+  rsenv-version-file-read .rust-version ||
+  rsenv-version-file-read .rsenv-version ||
+  { echo "rsenv: no local version configured for this directory"
+    exit 1
+  } >&2
+fi

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Summary: Display prefix for a Rust version
+# Usage: rsenv prefix [<version>]
+#
+# Displays the directory where a Rust version is installed. If no
+# version is given, `rsenv prefix' displays the location of the
+# currently selected version.
+
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+# Provide rsenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec rsenv-versions --bare
+fi
+
+if [ -n "$1" ]; then
+  export RSENV_VERSION="$1"
+elif [ -z "$RSENV_VERSION" ]; then
+  RSENV_VERSION="$(rsenv-version-name)"
+fi
+
+if [ "$RSENV_VERSION" = "system" ]; then
+  if RUST_PATH="$(rsenv-which rust 2>/dev/null)"; then
+    RUST_PATH="${RUST_PATH%/*}"
+    echo "${RUST_PATH%/bin}"
+    exit
+  else
+    echo "rsenv: system version not found in PATH" >&2
+    exit 1
+  fi
+fi
+
+RSENV_PREFIX_PATH="${RSENV_ROOT}/versions/${RSENV_VERSION}"
+if [ ! -d "$RSENV_PREFIX_PATH" ]; then
+  echo "rsenv: version \`${RSENV_VERSION}' not installed" >&2
+  exit 1
+fi
+
+echo "$RSENV_PREFIX_PATH"

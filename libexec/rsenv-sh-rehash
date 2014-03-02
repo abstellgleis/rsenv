@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -e
-[ -n "$RBENV_DEBUG" ] && set -x
+[ -n "$RSENV_DEBUG" ] && set -x
 
-# Provide rbenv completions
+# Provide rsenv completions
 if [ "$1" = "--complete" ]; then
-  exec rbenv-rehash --complete
+  exec rsenv-rehash --complete
 fi
 
-shell="$(basename "${RBENV_SHELL:-$SHELL}")"
+shell="$(basename "${RSENV_SHELL:-$SHELL}")"
 
-# When rbenv shell integration is enabled, delegate to rbenv-rehash,
+# When rsenv shell integration is enabled, delegate to rsenv-rehash,
 # then tell the shell to empty its command lookup cache.
-rbenv-rehash
+rsenv-rehash
 
 case "$shell" in
 fish )

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Summary: Show the current Rust version and its origin
+#
+# Shows the currently selected Rust version and how it was
+# selected. To obtain only the version string, use `rsenv
+# version-name'.
+
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+echo "$(rsenv-version-name) (set by $(rsenv-version-origin))"

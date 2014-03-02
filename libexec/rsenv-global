@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the global Rust version
+#
+# Usage: rsenv global <version>
+#
+# Sets the global Rust version. You can override the global version at
+# any time by setting a directory-specific version with `rsenv local'
+# or by setting the `RSENV_VERSION' environment variable.
+#
+# <version> should be a string matching a Rust version known to rsenv.
+# The special version string `system' will use your default system Rust.
+# Run `rsenv versions' for a list of available Rust versions.
+
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+# Provide rsenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec rsenv-versions --bare
+fi
+
+RSENV_VERSION="$1"
+RSENV_VERSION_FILE="${RSENV_ROOT}/version"
+
+if [ -n "$RSENV_VERSION" ]; then
+  rsenv-version-file-write "$RSENV_VERSION_FILE" "$RSENV_VERSION"
+else
+  rsenv-version-file-read "$RSENV_VERSION_FILE" ||
+  rsenv-version-file-read "${RSENV_ROOT}/global" ||
+  rsenv-version-file-read "${RSENV_ROOT}/default" ||
+  echo system
+fi

@@ -3,27 +3,27 @@
 load test_helper
 
 @test "no shims" {
-  run rbenv-shims
+  run rsenv-shims
   assert_success
   assert [ -z "$output" ]
 }
 
 @test "shims" {
-  mkdir -p "${RBENV_ROOT}/shims"
-  touch "${RBENV_ROOT}/shims/ruby"
-  touch "${RBENV_ROOT}/shims/irb"
-  run rbenv-shims
+  mkdir -p "${RSENV_ROOT}/shims"
+  touch "${RSENV_ROOT}/shims/rust"
+  touch "${RSENV_ROOT}/shims/irb"
+  run rsenv-shims
   assert_success
-  assert_line "${RBENV_ROOT}/shims/ruby"
-  assert_line "${RBENV_ROOT}/shims/irb"
+  assert_line "${RSENV_ROOT}/shims/rust"
+  assert_line "${RSENV_ROOT}/shims/irb"
 }
 
 @test "shims --short" {
-  mkdir -p "${RBENV_ROOT}/shims"
-  touch "${RBENV_ROOT}/shims/ruby"
-  touch "${RBENV_ROOT}/shims/irb"
-  run rbenv-shims --short
+  mkdir -p "${RSENV_ROOT}/shims"
+  touch "${RSENV_ROOT}/shims/rust"
+  touch "${RSENV_ROOT}/shims/irb"
+  run rsenv-shims --short
   assert_success
   assert_line "irb"
-  assert_line "ruby"
+  assert_line "rust"
 }

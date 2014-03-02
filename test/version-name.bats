@@ -3,63 +3,63 @@
 load test_helper
 
 create_version() {
-  mkdir -p "${RBENV_ROOT}/versions/$1"
+  mkdir -p "${RSENV_ROOT}/versions/$1"
 }
 
 setup() {
-  mkdir -p "$RBENV_TEST_DIR"
-  cd "$RBENV_TEST_DIR"
+  mkdir -p "$RSENV_TEST_DIR"
+  cd "$RSENV_TEST_DIR"
 }
 
 @test "no version selected" {
-  assert [ ! -d "${RBENV_ROOT}/versions" ]
-  run rbenv-version-name
+  assert [ ! -d "${RSENV_ROOT}/versions" ]
+  run rsenv-version-name
   assert_success "system"
 }
 
 @test "system version is not checked for existance" {
-  RBENV_VERSION=system run rbenv-version-name
+  RSENV_VERSION=system run rsenv-version-name
   assert_success "system"
 }
 
-@test "RBENV_VERSION has precedence over local" {
-  create_version "1.8.7"
-  create_version "1.9.3"
+@test "RSENV_VERSION has precedence over local" {
+  create_version "0.8"
+  create_version "0.9"
 
-  cat > ".ruby-version" <<<"1.8.7"
-  run rbenv-version-name
-  assert_success "1.8.7"
+  cat > ".rust-version" <<<"0.8"
+  run rsenv-version-name
+  assert_success "0.8"
 
-  RBENV_VERSION=1.9.3 run rbenv-version-name
-  assert_success "1.9.3"
+  RSENV_VERSION=0.9 run rsenv-version-name
+  assert_success "0.9"
 }
 
 @test "local file has precedence over global" {
-  create_version "1.8.7"
-  create_version "1.9.3"
+  create_version "0.8"
+  create_version "0.9"
 
-  cat > "${RBENV_ROOT}/version" <<<"1.8.7"
-  run rbenv-version-name
-  assert_success "1.8.7"
+  cat > "${RSENV_ROOT}/version" <<<"0.8"
+  run rsenv-version-name
+  assert_success "0.8"
 
-  cat > ".ruby-version" <<<"1.9.3"
-  run rbenv-version-name
-  assert_success "1.9.3"
+  cat > ".rust-version" <<<"0.9"
+  run rsenv-version-name
+  assert_success "0.9"
 }
 
 @test "missing version" {
-  RBENV_VERSION=1.2 run rbenv-version-name
-  assert_failure "rbenv: version \`1.2' is not installed"
+  RSENV_VERSION=1.2 run rsenv-version-name
+  assert_failure "rsenv: version \`1.2' is not installed"
 }
 
 @test "version with prefix in name" {
-  create_version "1.8.7"
-  cat > ".ruby-version" <<<"ruby-1.8.7"
-  run rbenv-version-name
+  create_version "0.8"
+  cat > ".rust-version" <<<"rust-0.8"
+  run rsenv-version-name
   assert_success
   assert_output <<OUT
-warning: ignoring extraneous \`ruby-' prefix in version \`ruby-1.8.7'
-         (set by ${PWD}/.ruby-version)
-1.8.7
+warning: ignoring extraneous \`rust-' prefix in version \`rust-0.8'
+         (set by ${PWD}/.rust-version)
+0.8
 OUT
 }

@@ -1,73 +1,48 @@
-# Groom your app’s Ruby environment with rbenv.
+# Groom your app’s Rust environment with rsenv.
 
-Use rbenv to pick a Ruby version for your application and guarantee
-that your development environment matches production. Put rbenv to work
-with [Bundler](http://gembundler.com/) for painless Ruby upgrades and
-bulletproof deployments.
-
-**Powerful in development.** Specify your app's Ruby version once,
-  in a single file. Keep all your teammates on the same page. No
-  headaches running apps on different versions of Ruby. Just Works™
-  from the command line and with app servers like [Pow](http://pow.cx).
-  Override the Ruby version anytime: just set an environment variable.
-
-**Rock-solid in production.** Your application's executables are its
-  interface with ops. With rbenv and [Bundler
-  binstubs](https://github.com/sstephenson/rbenv/wiki/Understanding-binstubs)
-  you'll never again need to `cd` in a cron job or Chef recipe to
-  ensure you've selected the right runtime. The Ruby version
-  dependency lives in one place—your app—so upgrades and rollbacks are
-  atomic, even when you switch versions.
-
-**One thing well.** rbenv is concerned solely with switching Ruby
-  versions. It's simple and predictable. A rich plugin ecosystem lets
-  you tailor it to suit your needs. Compile your own Ruby versions, or
-  use the [ruby-build][]
-  plugin to automate the process. Specify per-application environment
-  variables with [rbenv-vars](https://github.com/sstephenson/rbenv-vars).
-  See more [plugins on the
-  wiki](https://github.com/sstephenson/rbenv/wiki/Plugins).
-
-[**Why choose rbenv over
-RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
+Use rsenv to pick a Rust version for your application and guarantee
+that your development environment matches production.
 
 ## Table of Contents
 
 * [How It Works](#how-it-works)
   * [Understanding PATH](#understanding-path)
   * [Understanding Shims](#understanding-shims)
-  * [Choosing the Ruby Version](#choosing-the-ruby-version)
-  * [Locating the Ruby Installation](#locating-the-ruby-installation)
+  * [Choosing the Rust Version](#choosing-the-rust-version)
+  * [Locating the Rust Installation](#locating-the-rust-installation)
 * [Installation](#installation)
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
-  * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
-  * [How rbenv hooks into your shell](#how-rbenv-hooks-into-your-shell)
-  * [Installing Ruby Versions](#installing-ruby-versions)
-  * [Uninstalling Ruby Versions](#uninstalling-ruby-versions)
+  * [How rsenv hooks into your shell](#how-rsenv-hooks-into-your-shell)
+  * [Installing Rust Versions](#installing-rust-versions)
+  * [Uninstalling Rust Versions](#uninstalling-rust-versions)
 * [Command Reference](#command-reference)
-  * [rbenv local](#rbenv-local)
-  * [rbenv global](#rbenv-global)
-  * [rbenv shell](#rbenv-shell)
-  * [rbenv versions](#rbenv-versions)
-  * [rbenv version](#rbenv-version)
-  * [rbenv rehash](#rbenv-rehash)
-  * [rbenv which](#rbenv-which)
-  * [rbenv whence](#rbenv-whence)
+  * [rsenv local](#rsenv-local)
+  * [rsenv global](#rsenv-global)
+  * [rsenv shell](#rsenv-shell)
+  * [rsenv versions](#rsenv-versions)
+  * [rsenv version](#rsenv-version)
+  * [rsenv rehash](#rsenv-rehash)
+  * [rsenv which](#rsenv-which)
+  * [rsenv whence](#rsenv-whence)
 * [Development](#development)
   * [Version History](#version-history)
   * [License](#license)
 
+
+
 ## How It Works
 
-At a high level, rbenv intercepts Ruby commands using shim
-executables injected into your `PATH`, determines which Ruby version
+At a high level, rsenv intercepts Rust commands using shim
+executables injected into your `PATH`, determines which Rust version
 has been specified by your application, and passes your commands along
-to the correct Ruby installation.
+to the correct Rust installation.
+
+
 
 ### Understanding PATH
 
-When you run a command like `ruby` or `rake`, your operating system
+When you run a command like `rust` or `rake`, your operating system
 searches through a list of directories to find an executable file with
 that name. This list of directories lives in an environment variable
 called `PATH`, with each directory in the list separated by a colon:
@@ -80,335 +55,316 @@ precedence over another one at the end. In this example, the
 `/usr/local/bin` directory will be searched first, then `/usr/bin`,
 then `/bin`.
 
+
+
 ### Understanding Shims
 
-rbenv works by inserting a directory of _shims_ at the front of your
+rsenv works by inserting a directory of _shims_ at the front of your
 `PATH`:
 
-    ~/.rbenv/shims:/usr/local/bin:/usr/bin:/bin
+    ~/.rsenv/shims:/usr/local/bin:/usr/bin:/bin
 
-Through a process called _rehashing_, rbenv maintains shims in that
-directory to match every Ruby command across every installed version
-of Ruby—`irb`, `gem`, `rake`, `rails`, `ruby`, and so on.
+Through a process called _rehashing_, rsenv maintains shims in that
+directory to match every Rust command across every installed version
+of Rust—`irb`, `gem`, `rake`, `rails`, `rust`, and so on.
 
 Shims are lightweight executables that simply pass your command along
-to rbenv. So with rbenv installed, when you run, say, `rake`, your
+to rsenv. So with rsenv installed, when you run, say, `rake`, your
 operating system will do the following:
 
 * Search your `PATH` for an executable file named `rake`
-* Find the rbenv shim named `rake` at the beginning of your `PATH`
+* Find the rsenv shim named `rake` at the beginning of your `PATH`
 * Run the shim named `rake`, which in turn passes the command along to
-  rbenv
+  rsenv
 
-### Choosing the Ruby Version
 
-When you execute a shim, rbenv determines which Ruby version to use by
+
+### Choosing the Rust Version
+
+When you execute a shim, rsenv determines which Rust version to use by
 reading it from the following sources, in this order:
 
-1. The `RBENV_VERSION` environment variable, if specified. You can use
-   the [`rbenv shell`](#rbenv-shell) command to set this environment
+1. The `RSENV_VERSION` environment variable, if specified. You can use
+   the [`rsenv shell`](#rsenv-shell) command to set this environment
    variable in your current shell session.
 
-2. The first `.ruby-version` file found by searching the directory of the
+2. The first `.rust-version` file found by searching the directory of the
    script you are executing and each of its parent directories until reaching
    the root of your filesystem.
 
-3. The first `.ruby-version` file found by searching the current working
+3. The first `.rust-version` file found by searching the current working
    directory and each of its parent directories until reaching the root of your
-   filesystem. You can modify the `.ruby-version` file in the current working
-   directory with the [`rbenv local`](#rbenv-local) command.
+   filesystem. You can modify the `.rust-version` file in the current working
+   directory with the [`rsenv local`](#rsenv-local) command.
 
-4. The global `~/.rbenv/version` file. You can modify this file using
-   the [`rbenv global`](#rbenv-global) command. If the global version
-   file is not present, rbenv assumes you want to use the "system"
-   Ruby—i.e. whatever version would be run if rbenv weren't in your
+4. The global `~/.rsenv/version` file. You can modify this file using
+   the [`rsenv global`](#rsenv-global) command. If the global version
+   file is not present, rsenv assumes you want to use the "system"
+   Rust—i.e. whatever version would be run if rsenv weren't in your
    path.
 
-### Locating the Ruby Installation
 
-Once rbenv has determined which version of Ruby your application has
-specified, it passes the command along to the corresponding Ruby
+
+### Locating the Rust Installation
+
+Once rsenv has determined which version of Rust your application has
+specified, it passes the command along to the corresponding Rust
 installation.
 
-Each Ruby version is installed into its own directory under
-`~/.rbenv/versions`. For example, you might have these versions
+Each Rust version is installed into its own directory under
+`~/.rsenv/versions`. For example, you might have these versions
 installed:
 
-* `~/.rbenv/versions/1.8.7-p371/`
-* `~/.rbenv/versions/1.9.3-p327/`
-* `~/.rbenv/versions/jruby-1.7.1/`
+* `~/.rsenv/versions/0.8/`
+* `~/.rsenv/versions/0.9/`
+* `~/.rsenv/versions/0.10-pre/`
 
-Version names to rbenv are simply the names of the directories in
-`~/.rbenv/versions`.
+Version names to rsenv are simply the names of the directories in
+`~/.rsenv/versions`.
+
+
 
 ## Installation
 
-**Compatibility note**: rbenv is _incompatible_ with RVM. Please make
-  sure to fully uninstall RVM and remove any references to it from
-  your shell initialization files before installing rbenv.
 
-If you're on Mac OS X, consider
-[installing with Homebrew](#homebrew-on-mac-os-x).
 
 ### Basic GitHub Checkout
 
-This will get you going with the latest version of rbenv and make it
+This will get you going with the latest version of rsenv and make it
 easy to fork and contribute any changes back upstream.
 
-1. Check out rbenv into `~/.rbenv`.
+1. Check out rsenv into `~/.rsenv`.
 
     ~~~ sh
-    $ git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+    $ git clone https://github.com/asaaki/rsenv.git ~/.rsenv
     ~~~
 
-2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
+2. Add `~/.rsenv/bin` to your `$PATH` for access to the `rsenv`
    command-line utility.
 
     ~~~ sh
-    $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+    $ echo 'export PATH="$HOME/.rsenv/bin:$PATH"' >> ~/.bash_profile
     ~~~
 
     **Ubuntu Desktop note**: Modify your `~/.bashrc` instead of `~/.bash_profile`.
 
     **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
 
-3. Add `rbenv init` to your shell to enable shims and autocompletion.
+3. Add `rsenv init` to your shell to enable shims and autocompletion.
 
     ~~~ sh
-    $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+    $ echo 'eval "$(rsenv init -)"' >> ~/.bash_profile
     ~~~
 
     _Same as in previous step, use `~/.bashrc` on Ubuntu, or `~/.zshrc` for Zsh._
 
 4. Restart your shell so that PATH changes take effect. (Opening a new
-   terminal tab will usually do it.) Now check if rbenv was set up:
+   terminal tab will usually do it.) Now check if rsenv was set up:
 
     ~~~ sh
-    $ type rbenv
-    #=> "rbenv is a function"
+    $ type rsenv
+    #=> "rsenv is a function"
     ~~~
 
-5. _(Optional)_ Install [ruby-build][], which provides the
-   `rbenv install` command that simplifies the process of
-   [installing new Ruby versions](#installing-ruby-versions).
+5. _(Optional)_ Install [rust-build][], which provides the
+   `rsenv install` command that simplifies the process of
+   [installing new Rust versions](#installing-rust-versions).
+
+
 
 #### Upgrading
 
-If you've installed rbenv manually using git, you can upgrade your
+If you've installed rsenv manually using git, you can upgrade your
 installation to the cutting-edge version at any time.
 
 ~~~ sh
-$ cd ~/.rbenv
+$ cd ~/.rsenv
 $ git pull
 ~~~
 
-To use a specific release of rbenv, check out the corresponding tag:
+To use a specific release of rsenv, check out the corresponding tag:
 
 ~~~ sh
-$ cd ~/.rbenv
+$ cd ~/.rsenv
 $ git fetch
-$ git checkout v0.3.0
+$ git checkout v0.1.0
 ~~~
 
-If you've [installed via Homebrew](#homebrew-on-mac-os-x), then upgrade
-via its `brew` command:
 
-~~~ sh
-$ brew update
-$ brew upgrade rbenv ruby-build
-~~~
 
-### Homebrew on Mac OS X
-
-As an alternative to installation via GitHub checkout, you can install
-rbenv and [ruby-build][] using the [Homebrew](http://brew.sh) package
-manager on Mac OS X:
-
-~~~
-$ brew update
-$ brew install rbenv ruby-build
-~~~
-
-Afterwards you'll still need to add `eval "$(rbenv init -)"` to your
-profile as stated in the caveats. You'll only ever have to do this
-once.
-
-### How rbenv hooks into your shell
+### How rsenv hooks into your shell
 
 Skip this section unless you must know what every line in your shell
 profile is doing.
 
-`rbenv init` is the only command that crosses the line of loading
+`rsenv init` is the only command that crosses the line of loading
 extra commands into your shell. Coming from RVM, some of you might be
-opposed to this idea. Here's what `rbenv init` actually does:
+opposed to this idea. Here's what `rsenv init` actually does:
 
-1. Sets up your shims path. This is the only requirement for rbenv to
+1. Sets up your shims path. This is the only requirement for rsenv to
    function properly. You can do this by hand by prepending
-   `~/.rbenv/shims` to your `$PATH`.
+   `~/.rsenv/shims` to your `$PATH`.
 
 2. Installs autocompletion. This is entirely optional but pretty
-   useful. Sourcing `~/.rbenv/completions/rbenv.bash` will set that
-   up. There is also a `~/.rbenv/completions/rbenv.zsh` for Zsh
+   useful. Sourcing `~/.rsenv/completions/rsenv.bash` will set that
+   up. There is also a `~/.rsenv/completions/rsenv.zsh` for Zsh
    users.
 
 3. Rehashes shims. From time to time you'll need to rebuild your
    shim files. Doing this automatically makes sure everything is up to
-   date. You can always run `rbenv rehash` manually.
+   date. You can always run `rsenv rehash` manually.
 
 4. Installs the sh dispatcher. This bit is also optional, but allows
-   rbenv and plugins to change variables in your current shell, making
-   commands like `rbenv shell` possible. The sh dispatcher doesn't do
+   rsenv and plugins to change variables in your current shell, making
+   commands like `rsenv shell` possible. The sh dispatcher doesn't do
    anything crazy like override `cd` or hack your shell prompt, but if
-   for some reason you need `rbenv` to be a real script rather than a
+   for some reason you need `rsenv` to be a real script rather than a
    shell function, you can safely skip it.
 
-Run `rbenv init -` for yourself to see exactly what happens under the
+Run `rsenv init -` for yourself to see exactly what happens under the
 hood.
 
-### Installing Ruby Versions
+### Installing Rust Versions
 
-The `rbenv install` command doesn't ship with rbenv out of the box, but
-is provided by the [ruby-build][] project. If you installed it either
+The `rsenv install` command doesn't ship with rsenv out of the box, but
+is provided by the [rust-build][] project. If you installed it either
 as part of GitHub checkout process outlined above or via Homebrew, you
 should be able to:
 
 ~~~ sh
 # list all available versions:
-$ rbenv install -l
+$ rsenv install -l
 
-# install a Ruby version:
-$ rbenv install 2.0.0-p247
+# install a Rust version:
+$ rsenv install 0.10-pre
 ~~~
 
 Alternatively to the `install` command, you can download and compile
-Ruby manually as a subdirectory of `~/.rbenv/versions/`. An entry in
-that directory can also be a symlink to a Ruby version installed
-elsewhere on the filesystem. rbenv doesn't care; it will simply treat
-any entry in the `versions/` directory as a separate Ruby version.
+Rust manually as a subdirectory of `~/.rsenv/versions/`. An entry in
+that directory can also be a symlink to a Rust version installed
+elsewhere on the filesystem. rsenv doesn't care; it will simply treat
+any entry in the `versions/` directory as a separate Rust version.
 
-### Uninstalling Ruby Versions
+### Uninstalling Rust Versions
 
-As time goes on, Ruby versions you install will accumulate in your
-`~/.rbenv/versions` directory.
+As time goes on, Rust versions you install will accumulate in your
+`~/.rsenv/versions` directory.
 
-To remove old Ruby versions, simply `rm -rf` the directory of the
+To remove old Rust versions, simply `rm -rf` the directory of the
 version you want to remove. You can find the directory of a particular
-Ruby version with the `rbenv prefix` command, e.g. `rbenv prefix
-1.8.7-p357`.
+Rust version with the `rsenv prefix` command, e.g. `rsenv prefix
+0.8`.
 
-The [ruby-build][] plugin provides an `rbenv uninstall` command to
+The [rust-build][] plugin provides an `rsenv uninstall` command to
 automate the removal process.
 
 ## Command Reference
 
-Like `git`, the `rbenv` command delegates to subcommands based on its
+Like `git`, the `rsenv` command delegates to subcommands based on its
 first argument. The most common subcommands are:
 
-### rbenv local
+### rsenv local
 
-Sets a local application-specific Ruby version by writing the version
-name to a `.ruby-version` file in the current directory. This version
+Sets a local application-specific Rust version by writing the version
+name to a `.rust-version` file in the current directory. This version
 overrides the global version, and can be overridden itself by setting
-the `RBENV_VERSION` environment variable or with the `rbenv shell`
+the `RSENV_VERSION` environment variable or with the `rsenv shell`
 command.
 
-    $ rbenv local 1.9.3-p327
+    $ rsenv local 0.8
 
-When run without a version number, `rbenv local` reports the currently
+When run without a version number, `rsenv local` reports the currently
 configured local version. You can also unset the local version:
 
-    $ rbenv local --unset
+    $ rsenv local --unset
 
-Previous versions of rbenv stored local version specifications in a
-file named `.rbenv-version`. For backwards compatibility, rbenv will
-read a local version specified in an `.rbenv-version` file, but a
-`.ruby-version` file in the same directory will take precedence.
+Previous versions of rsenv stored local version specifications in a
+file named `.rsenv-version`. For backwards compatibility, rsenv will
+read a local version specified in an `.rsenv-version` file, but a
+`.rust-version` file in the same directory will take precedence.
 
-### rbenv global
+### rsenv global
 
-Sets the global version of Ruby to be used in all shells by writing
-the version name to the `~/.rbenv/version` file. This version can be
-overridden by an application-specific `.ruby-version` file, or by
-setting the `RBENV_VERSION` environment variable.
+Sets the global version of Rust to be used in all shells by writing
+the version name to the `~/.rsenv/version` file. This version can be
+overridden by an application-specific `.rust-version` file, or by
+setting the `RSENV_VERSION` environment variable.
 
-    $ rbenv global 1.8.7-p352
+    $ rsenv global 0.9
 
-The special version name `system` tells rbenv to use the system Ruby
+The special version name `system` tells rsenv to use the system Rust
 (detected by searching your `$PATH`).
 
-When run without a version number, `rbenv global` reports the
+When run without a version number, `rsenv global` reports the
 currently configured global version.
 
-### rbenv shell
+### rsenv shell
 
-Sets a shell-specific Ruby version by setting the `RBENV_VERSION`
+Sets a shell-specific Rust version by setting the `RSENV_VERSION`
 environment variable in your shell. This version overrides
 application-specific versions and the global version.
 
-    $ rbenv shell jruby-1.7.1
+    $ rsenv shell 0.10-pre
 
-When run without a version number, `rbenv shell` reports the current
-value of `RBENV_VERSION`. You can also unset the shell version:
+When run without a version number, `rsenv shell` reports the current
+value of `RSENV_VERSION`. You can also unset the shell version:
 
-    $ rbenv shell --unset
+    $ rsenv shell --unset
 
-Note that you'll need rbenv's shell integration enabled (step 3 of
+Note that you'll need rsenv's shell integration enabled (step 3 of
 the installation instructions) in order to use this command. If you
 prefer not to use shell integration, you may simply set the
-`RBENV_VERSION` variable yourself:
+`RSENV_VERSION` variable yourself:
 
-    $ export RBENV_VERSION=jruby-1.7.1
+    $ export RSENV_VERSION=0.10-pre
 
-### rbenv versions
+### rsenv versions
 
-Lists all Ruby versions known to rbenv, and shows an asterisk next to
+Lists all Rust versions known to rsenv, and shows an asterisk next to
 the currently active version.
 
-    $ rbenv versions
-      1.8.7-p352
-      1.9.2-p290
-    * 1.9.3-p327 (set by /Users/sam/.rbenv/version)
-      jruby-1.7.1
-      rbx-1.2.4
-      ree-1.8.7-2011.03
+    $ rsenv versions
+      0.8
+    * 0.9 (set by /Users/sam/.rsenv/version)
+      0.10-pre
 
-### rbenv version
+### rsenv version
 
-Displays the currently active Ruby version, along with information on
+Displays the currently active Rust version, along with information on
 how it was set.
 
-    $ rbenv version
-    1.8.7-p352 (set by /Volumes/37signals/basecamp/.ruby-version)
+    $ rsenv version
+    0.8 (set by /Volumes/37signals/basecamp/.rust-version)
 
-### rbenv rehash
+### rsenv rehash
 
-Installs shims for all Ruby executables known to rbenv (i.e.,
-`~/.rbenv/versions/*/bin/*`). Run this command after you install a new
-version of Ruby, or install a gem that provides commands.
+Installs shims for all Rust executables known to rsenv (i.e.,
+`~/.rsenv/versions/*/bin/*`). Run this command after you install a new
+version of Rust, or install a gem that provides commands.
 
-    $ rbenv rehash
+    $ rsenv rehash
 
-### rbenv which
+### rsenv which
 
-Displays the full path to the executable that rbenv will invoke when
+Displays the full path to the executable that rsenv will invoke when
 you run the given command.
 
-    $ rbenv which irb
-    /Users/sam/.rbenv/versions/1.9.3-p327/bin/irb
+    $ rsenv which irb
+    /Users/sam/.rsenv/versions/0.9/bin/irb
 
-### rbenv whence
+### rsenv whence
 
-Lists all Ruby versions with the given command installed.
+Lists all Rust versions with the given command installed.
 
-    $ rbenv whence rackup
-    1.9.3-p327
-    jruby-1.7.1
-    ree-1.8.7-2011.03
+    $ rsenv whence rackup
+    0.8
+    0.9
+    0.10-pre
 
 ## Development
 
-The rbenv source code is [hosted on
-GitHub](https://github.com/sstephenson/rbenv). It's clean, modular,
+The rsenv source code is [hosted on
+GitHub](https://github.com/asaaki/rsenv). It's clean, modular,
 and easy to understand, even if you're not a shell hacker.
 
 Tests are executed using [Bats](https://github.com/sstephenson/bats):
@@ -417,139 +373,24 @@ Tests are executed using [Bats](https://github.com/sstephenson/bats):
     $ bats test/<file>.bats
 
 Please feel free to submit pull requests and file bugs on the [issue
-tracker](https://github.com/sstephenson/rbenv/issues).
+tracker](https://github.com/asaaki/rsenv/issues).
+
+
 
 ### Version History
 
-**0.4.0** (January 4, 2013)
-
-* rbenv now prefers `.ruby-version` files to `.rbenv-version` files
-  for specifying local application-specific versions. The
-  `.ruby-version` file has the same format as `.rbenv-version` but is
-  [compatible with other Ruby version
-  managers](https://gist.github.com/1912050).
-* Deprecated `ruby-local-exec` and moved its functionality into the
-  standard `ruby` shim. See the [ruby-local-exec wiki
-  page](https://github.com/sstephenson/rbenv/wiki/ruby-local-exec) for
-  upgrade instructions.
-* Modified shims to include the full path to rbenv so that they can be
-  invoked without having rbenv's bin directory in the `$PATH`.
-* Sped up `rbenv init` by avoiding rbenv reinitialization and by
-  using a simpler indexing approach. (Users of
-  [chef-rbenv](https://github.com/fnichol/chef-rbenv) should upgrade
-  to the latest version to fix a [compatibility
-  issue](https://github.com/fnichol/chef-rbenv/pull/26).)
-* Reworked `rbenv help` so that usage and documentation is stored as a
-  comment in each subcommand, enabling plugin commands to hook into
-  the help system.
-* Added support for full completion of the command line, not just the
-  first argument.
-* Updated installation instructions for Zsh and Ubuntu users.
-* Fixed `rbenv which` and `rbenv prefix` with system Ruby versions.
-* Changed `rbenv exec` to avoid prepending the system Ruby location to
-  `$PATH` to fix issues running system Ruby commands that invoke other
-  commands.
-* Changed `rbenv rehash` to ensure it exits with a 0 status code under
-  normal operation, and to ensure outdated shims are removed first
-  when rehashing.
-* Modified `rbenv rehash` to run `hash -r` afterwards, when shell
-  integration is enabled, to ensure the shell's command cache is
-  cleared.
-* Removed use of the `+=` operator to support older versions of Bash.
-* Adjusted non-bare `rbenv versions` output to include `system`, if
-  present.
-* Improved documentation for installing and uninstalling Ruby
-  versions.
-* Fixed `rbenv versions` not to display a warning if the currently
-  specified version doesn't exist.
-* Fixed an instance of local variable leakage in the `rbenv` shell
-  function wrapper.
-* Changed `rbenv shell` to ensure it exits with a non-zero status on
-  failure.
-* Added `rbenv --version` for printing the current version of rbenv.
-* Added `/usr/lib/rbenv/hooks` to the plugin hook search path.
-* Fixed `rbenv which` to account for path entries with spaces.
-* Changed `rbenv init` to accept option arguments in any order.
-
-**0.3.0** (December 25, 2011)
-
-* Added an `rbenv root` command which prints the value of
-  `$RBENV_ROOT`, or the default root directory if it's unset.
-* Clarified Zsh installation instructions in the Readme.
-* Removed some redundant code in `rbenv rehash`.
-* Fixed an issue with calling `readlink` for paths with spaces.
-* Changed Zsh initialization code to install completion hooks only for
-  interactive shells.
-* Added preliminary support for ksh.
-* `rbenv rehash` creates or removes shims only when necessary instead
-  of removing and re-creating all shims on each invocation.
-* Fixed that `RBENV_DIR`, when specified, would be incorrectly
-  expanded to its parent directory.
-* Removed the deprecated `set-default` and `set-local` commands.
-* Added a `--no-rehash` option to `rbenv init` for skipping the
-  automatic rehash when opening a new shell.
-
-**0.2.1** (October 1, 2011)
-
-* Changed the `rbenv` command to ensure that `RBENV_DIR` is always an
-  absolute path. This fixes an issue where Ruby scripts using the
-  `ruby-local-exec` wrapper would go into an infinite loop when
-  invoked with a relative path from the command line.
-
-**0.2.0** (September 28, 2011)
-
-* Renamed `rbenv set-default` to `rbenv global` and `rbenv set-local`
-  to `rbenv local`. The `set-` commands are deprecated and will be
-  removed in the next major release.
-* rbenv now uses `greadlink` on Solaris.
-* Added a `ruby-local-exec` command which can be used in shebangs in
-  place of `#!/usr/bin/env ruby` to properly set the project-specific
-  Ruby version regardless of current working directory.
-* Fixed an issue with `rbenv rehash` when no binaries are present.
-* Added support for `rbenv-sh-*` commands, which run inside the
-  current shell instead of in a child process.
-* Added an `rbenv shell` command for conveniently setting the
-  `$RBENV_VERSION` environment variable.
-* Added support for storing rbenv versions and shims in directories
-  other than `~/.rbenv` with the `$RBENV_ROOT` environment variable.
-* Added support for debugging rbenv via `set -x` when the
-  `$RBENV_DEBUG` environment variable is set.
-* Refactored the autocompletion system so that completions are now
-  built-in to each command and shared between bash and Zsh.
-* Added support for plugin bundles in `~/.rbenv/plugins` as documented
-  in [issue #102](https://github.com/sstephenson/rbenv/pull/102).
-* Added `/usr/local/etc/rbenv.d` to the list of directories searched
-  for rbenv hooks.
-* Added support for an `$RBENV_DIR` environment variable which
-  defaults to the current working directory for specifying where rbenv
-  searches for local version files.
-
-**0.1.2** (August 16, 2011)
-
-* Fixed rbenv to be more resilient against nonexistent entries in
-  `$PATH`.
-* Made the `rbenv rehash` command operate atomically.
-* Modified the `rbenv init` script to automatically run `rbenv
-  rehash` so that shims are recreated whenever a new shell is opened.
-* Added initial support for Zsh autocompletion.
-* Removed the dependency on egrep for reading version files.
-
-**0.1.1** (August 14, 2011)
-
-* Fixed a syntax error in the `rbenv help` command.
-* Removed `-e` from the shebang in favor of `set -e` at the top of
-  each file for compatibility with operating systems that do not
-  support more than one argument in the shebang.
 
 **0.1.0** (August 11, 2011)
 
 * Initial public release.
 
+
+
 ### License
 
 (The MIT license)
 
-Copyright (c) 2013 Sam Stephenson
+Copyright (c) 2014 Christoph Grabo
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -571,4 +412,4 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-  [ruby-build]: https://github.com/sstephenson/ruby-build#readme
+  [rust-build]: https://github.com/asaaki/rust-build#readme

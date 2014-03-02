@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Summary: List hook scripts for a given rbenv command
-# Usage: rbenv hooks <command>
+# Summary: List hook scripts for a given rsenv command
+# Usage: rsenv hooks <command>
 
 set -e
-[ -n "$RBENV_DEBUG" ] && set -x
+[ -n "$RSENV_DEBUG" ] && set -x
 
-# Provide rbenv completions
+# Provide rsenv completions
 if [ "$1" = "--complete" ]; then
   echo exec
   echo rehash
@@ -13,15 +13,15 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
-RBENV_COMMAND="$1"
-if [ -z "$RBENV_COMMAND" ]; then
-  rbenv-help --usage hooks >&2
+RSENV_COMMAND="$1"
+if [ -z "$RSENV_COMMAND" ]; then
+  rsenv-help --usage hooks >&2
   exit 1
 fi
 
 READLINK=$(type -p greadlink readlink | head -1)
 if [ -z "$READLINK" ]; then
-  echo "rbenv: cannot find readlink - are you missing GNU coreutils?" >&2
+  echo "rsenv: cannot find readlink - are you missing GNU coreutils?" >&2
   exit 1
 fi
 
@@ -43,11 +43,11 @@ realpath() {
   cd "$cwd"
 }
 
-IFS=: hook_paths=($RBENV_HOOK_PATH)
+IFS=: hook_paths=($RSENV_HOOK_PATH)
 
 shopt -s nullglob
 for path in "${hook_paths[@]}"; do
-  for script in "$path/$RBENV_COMMAND"/*.bash; do
+  for script in "$path/$RSENV_COMMAND"/*.bash; do
     echo $(realpath $script)
   done
 done

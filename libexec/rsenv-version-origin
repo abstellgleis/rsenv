@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Summary: Explain how the current Rust version is set
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+if [ -n "$RSENV_VERSION" ]; then
+  echo "RSENV_VERSION environment variable"
+else
+  rsenv-version-file
+fi

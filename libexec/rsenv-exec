@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# Summary: Run an executable with the selected Rust version
+#
+# Usage: rsenv exec <command> [arg1 arg2...]
+#
+# Runs an executable by first preparing PATH so that the selected Rust
+# version's `bin' directory is at the front.
+#
+# For example, if the currently selected Rust version is 0.9-p327:
+#   rsenv exec bundle install
+#
+# is equivalent to:
+#   PATH="$RSENV_ROOT/versions/0.9-p327/bin:$PATH" bundle install
+
+set -e
+[ -n "$RSENV_DEBUG" ] && set -x
+
+# Provide rsenv completions
+if [ "$1" = "--complete" ]; then
+  exec rsenv shims --short
+fi
+
+RSENV_VERSION="$(rsenv-version-name)"
+RSENV_COMMAND="$1"
+
+if [ -z "$RSENV_COMMAND" ]; then
+  rsenv-help --usage exec >&2
+  exit 1
+fi
+
+export RSENV_VERSION
+RSENV_COMMAND_PATH="$(rsenv-which "$RSENV_COMMAND")"
+RSENV_BIN_PATH="${RSENV_COMMAND_PATH%/*}"
+
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`rsenv-hooks exec`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do
+  source "$script"
+done
+
+shift 1
+if [ "$RSENV_VERSION" != "system" ]; then
+  export PATH="${RSENV_BIN_PATH}:${PATH}"
+fi
+exec -a "$RSENV_COMMAND" "$RSENV_COMMAND_PATH" "$@"
