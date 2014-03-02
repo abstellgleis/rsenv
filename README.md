@@ -380,7 +380,7 @@ tracker](https://github.com/asaaki/rsenv/issues).
 ### Version History
 
 
-**0.1.0** (August 11, 2011)
+**0.1.0** (201-03-02)
 
 * Initial public release.
 
