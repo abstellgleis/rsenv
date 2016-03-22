@@ -1,5 +1,13 @@
 # Rust version management with **rsenv**.
 
+----
+
+**UNMAINTAINED!**
+
+Please use [multirust](https://github.com/brson/multirust) or [rsvm](https://github.com/sdepold/rsvm) instead.
+
+----
+
 Use rsenv to pick a Rust version for your application and guarantee
 that your development environment matches production.
 
